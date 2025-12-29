@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "campusglow-backend",
+  "private_key_id": "a3616ffd5b4685522a25587a88277ee317e6a2bd",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCkWzlq5SCM97te\nZIs3YsKU694B2iMbrzjph2mZrY3CeQFEO5RkQFi1dGlNG9rAeMhFTmZlHcyj+uwV\nPcK1NcPHAWzL+4kkglxNhvNs7EuQnGkfEvMc7RaSjLooU2fUlrU8P4clBJGQam3l\nF5I0JiVCZMZ+YgV37eyy/I0pj9VZBuFW9zrDgQVNh/YsfaZU+dLoUjDEMox9D7PP\nPBBUF5SFYzcOw7yZC3KoqA1tyqxKPrzA14sZzYZSOEcMwv2S2BOkN5jhlpbByEeE\nJ01pkUhFuLw1qR6C4ougAGyQ3+a98XgB86+7Zd6ZqCd9wULBGdOLIAFB6+JDhP5i\nGsk3+y31AgMBAAECggEAES2/yJ5+Un2qRel4a6eU8v/cSpFETiZ4amBO91MemA8R\nxNH9ZqUbIIw0XWzl5mw5cpUJOtRsiU820dmMumgOOIS7nG6EHR7LCwdp9h6Un17Z\n1fejFYjqbRLsej6Ngbjm5I83TvU1ScT2C5X1ICJEjrX90UPpkml57hNbpdZ01EMq\n6w9DqxDwNQM0Ezb35q0CbSzBJ+irYMehqGSALvmLE/WAxCVv1FilJFWLc7a6t3qn\nm3sm3j6KSGzxfob3CJAyny8vyAvtmgq8acdeZwsgweQCe1zGqAB7X/3sEeypE8iT\nEvDSeQuLxZC8cS9nf/q3MDn9E8qN9p0J3EtCtc7K2QKBgQDWHl140CnfsZ2k9cH4\nDtN2ng/5BQZ0x/4QPRRrnzFl2uQtsPK1wQ70hE5QVqp9Nu4xcyotyCyKswF3xj+2\ntw3Z7eBAZB9NTfEqew/oNMymhgntLbmgg5cPRzDZ7Iq+x21tF8faF3QGeUGXLhve\nEABeufs8Kcc6fK4wyMi8uD46ywKBgQDEgRiSZpLlGzotscxhv7mkCbXCrAtOcN06\nB98eonKM7/ynsECL5aWVgBx0w+2j99UGjVTHeolE6QQPpne1MviF00ZEj90tRmIL\n5lfkoVCPn11SwRr+J7BqBE0RCmgHbrfO/Nx6Trw4zfA+K3m3iCGic165EZRVNxFi\nlvYmeFtiPwKBgArzkqRTQVEHrKB7UWh2mao/e2GpOCNQ91WtShYXFle3UmRj4IYb\nUcB/4+GIDUBKRvSQh1/AFUci0Lhnk2qtAjBbUlT4ygESM3uQv8eIq874nBlddVkY\nYemOIpmC17XaTWZ/COHGwVBzcz9gRFyfROWTbZ4uJNqA9gfYvSup4MTxAoGAMOKs\n6j76bGTJpHSHFApOdLC1tyh1553Ma5NpvoVLWiSaBl2isSsAdqDYc3QKuq/9HxQp\n8zZYz/voNryDK2Dy0tgsswHXVFweKDe1xfsbv5816FCCFphpGvbW9VZRawfwUl41\nu3e6+6bADbdjIHWNaIyrE/97l3eLq6tCsW9fzKECgYAgt7eEWTeRUxwFO3Wh76oZ\nkS0lfycULmjl3MfZQ9gQ6f6L2E4VrIGTnE2phVVNHguiUCTq3TIdVtkRKH1PDdBr\nGMUQU61TtjlNMOaHOab52g9FrSqlt5CRBbU5Gj3yIh3jodR+A6qPhN22Rs4993Nx\nNCv3wHTWPyHyv7ttrdn6OA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "campus-glow@campusglow-backend.iam.gserviceaccount.com",
+  "client_id": "100629410935650471819",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/campus-glow%40campusglow-backend.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

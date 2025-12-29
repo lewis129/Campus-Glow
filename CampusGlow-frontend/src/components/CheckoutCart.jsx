@@ -38,7 +38,7 @@ function CheckoutCart({
     };
     try{
       const res = await fetch(
-      "https://campus-glow-1.onrender.com/order",
+      "https://campus-glow-r1y3.onrender.com/order",
       {
         method: "POST",
         headers: {
