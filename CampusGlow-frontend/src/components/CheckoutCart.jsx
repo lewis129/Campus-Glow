@@ -38,7 +38,7 @@ function CheckoutCart({
     };
     try{
       const res = await fetch(
-      "http://localhost:5000/order",
+      "https://campus-glow-1.onrender.com/order",
       {
         method: "POST",
         headers: {
