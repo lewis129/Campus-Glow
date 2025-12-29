@@ -1,14 +1,13 @@
-function Checkout({
-  product,
+import Category from "../Category";
+
+function CheckoutCart({
+  items,
   deliveryPrices,
   deliveryArea,
   pickupOptions,
   setPickupPoint,
   pickupPoint,
-  category,
   setDeliveryArea,
-  deliveryCost,
-  total,
   customerName,
   setCustomerName,
   phone,
@@ -18,47 +17,52 @@ function Checkout({
   setActive,
   onPlaceOrder,
 }) {
+  
+  const subtotal = items.reduce(
+        (sum, item) => sum + item.price * item.quantity, 0
+    )
   const sendToGoogleSheets = async () => {
     const orderData = {
-      productName: product.name,
-      price: product.price,
-      category,
-      type: product.type,
+        items:items.map ((item)=>({
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            type: item.type,
+        })),
       deliveryArea,
       pickupPoint,
-      deliveryCost,
       total,
       customerName,
       phone,
     };
-    await fetch(
-      "https://script.google.com/macros/s/AKfycbyN48KxCRw1fA8Ce_ptJoRCgFk2BPME-kqEjCVa2IXBgRy9G8T7aOrp__TmExoSxW87/exec",
+    try {
+     const res = await fetch(
+      "https://script.google.com/macros/s/AKfycbwffTF-L1AE8K83c9ksKjyjhS-INmql7qkq9nL3VJaX2U2MGc9DxGw5Pt9NniengDkk/exec",
       {
         method: "POST",
-        header: {
-          "Content-Type": "application/json",
+        headers: {
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(orderData),
       }
     )
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("response from google:", data);
-        if (data.ok) {
+    console.log("status", res.status)
+    const data = await res.json()
+    console.log ("response from google:", data)
+ if (data.ok) {
           console.log("order sent");
+          showToast("ordersubmitted succesfully !", "success");
         } else {
+          showToast("failed" + data.error, "error")
           console.log("failed:" + data.error);
-        }
-        showToast("ordersubmitted succesfully !", "success");
-        setTimeout(() => {
-          setActive("home");
-        }, 3000);
-      })
-      .catch((err) => {
+        } 
+      }catch(err)  {
         console.error("Error:", err);
         showToast("an error occured !", "error");
-      });
+      }  
   };
+  const deliveryCost = deliveryPrices[deliveryArea] || 0;
+  const total = subtotal + deliveryCost;
   const isFormValid =
     customerName.trim() !== "" &&
     phone.trim() !== "" &&
@@ -71,24 +75,25 @@ function Checkout({
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
           <path d="M73.4 297.4C60.9 309.9 60.9 330.2 73.4 342.7L233.4 502.7C245.9 515.2 266.2 515.2 278.7 502.7C291.2 490.2 291.2 469.9 278.7 457.4L173.3 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L173.3 288L278.7 182.6C291.2 170.1 291.2 149.8 278.7 137.3C266.2 124.8 245.9 124.8 233.4 137.3L73.4 297.3z" />
         </svg>
-        <h4>Checkout</h4>
+        <h4>Cart Checkout</h4>
       </section>
-      <div className="checkout">
-        <div className="c-product-card">
-          <img src={product.image} alt="image" />
-          <div className="c-product-card-info">
-            <p className="c-product-type">{product.type}</p>
-            <p className="c-product-name">{product.name}</p>
-            <p className="description">....</p>
-            <hr />
-            <div className="cost-breakdown-info-price product-price">
-              <p className="c-product-price">product price </p>
-              <span>KES {product.price}</span>
-            </div>
-          </div>
-        </div>
 
-        <div className="c-delivery-information">
+      <div className="cartCheckout">
+        {/*show all cart items */}
+        <div className="cc-list">
+          {items.map((item)=>(
+          <div key={item.id} className="cc-items">
+            <img src={item.image} alt="" />
+              <div className="cc-items-info">
+                <p>{item.name}</p>
+                <p>quantity: {item.quantity} </p>
+                <p style={{marginTop: "-5px"}}>Kes{item.price * item.quantity}</p>
+              </div>
+          </div>
+          ))}
+        </div>
+        <div>
+            {/*delivery area */}
           <div className="c-delivery">
             <div className="c-card-header">
               <svg
@@ -117,7 +122,7 @@ function Checkout({
               ))}
             </select>
           </div>
-          <div className="c-pickup-point">
+           <div className="c-pickup-point">
             <div className="c-card-header">
               <svg
                 className="c-svg"
@@ -128,9 +133,9 @@ function Checkout({
                 <path d="M465.4 192L431.1 144L209 144L174.7 192L465.4 192zM96 212.5C96 199.2 100.2 186.2 107.9 175.3L156.9 106.8C168.9 90 188.3 80 208.9 80L431 80C451.7 80 471.1 90 483.1 106.8L532 175.3C539.8 186.2 543.9 199.2 543.9 212.5L544 480C544 515.3 515.3 544 480 544L160 544C124.7 544 96 515.3 96 480L96 212.5z" />
               </svg>{" "}
               <div className="c-card-header-info">
-                <h3 for="Delivery">Pickup Point</h3>
+                <h3>Pickup Point</h3>
               </div>
-            </div>
+            </div> {/*pickup point */}
             <select
               value={pickupPoint}
               required
@@ -155,17 +160,17 @@ function Checkout({
                 <path d="M296 88C296 74.7 306.7 64 320 64C333.3 64 344 74.7 344 88L344 128L400 128C417.7 128 432 142.3 432 160C432 177.7 417.7 192 400 192L285.1 192C260.2 192 240 212.2 240 237.1C240 259.6 256.5 278.6 278.7 281.8L370.3 294.9C424.1 302.6 464 348.6 464 402.9C464 463.2 415.1 512 354.9 512L344 512L344 552C344 565.3 333.3 576 320 576C306.7 576 296 565.3 296 552L296 512L224 512C206.3 512 192 497.7 192 480C192 462.3 206.3 448 224 448L354.9 448C379.8 448 400 427.8 400 402.9C400 380.4 383.5 361.4 361.3 358.2L269.7 345.1C215.9 337.5 176 291.4 176 237.1C176 176.9 224.9 128 285.1 128L296 128L296 88z" />
               </svg>{" "}
               <div className="c-card-header-info">
-                <h3 for="Delivery">Cost Breakdown</h3>
+                <h3>Cost Breakdown</h3>
               </div>
             </div>
             <div className="cost-breakdown-info">
-              <div className="cost-breakdown-info-price">
-                <p className="c-product-price">product price </p>
-                <span>KES {product.price}</span>
-              </div>
               <div className="cost-breakdown-info-delivery-price">
                 <p>delivery cost</p>
                 <span className="c-delivery-cost">KES {deliveryCost}</span>
+              </div>
+              <div className="cost-breakdown-info-delivery-price ">
+                <p>SubTotal</p>
+                <span className="c-product-total">KES {subtotal}</span>
               </div>
               <div className="cost-breakdown-info-delivery-price ">
                 <p>total</p>
@@ -173,30 +178,19 @@ function Checkout({
               </div>
             </div>
           </div>
-          <div className="personel-details card">
-            <div className="c-card-header">
-              <svg
-                className="c-svg"
-                style={{ backgroundColor: "purple" }}
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 640 640"
-              >
-                <path d="M463 448.2C440.9 409.8 399.4 384 352 384L288 384C240.6 384 199.1 409.8 177 448.2C212.2 487.4 263.2 512 320 512C376.8 512 427.8 487.3 463 448.2zM64 320C64 178.6 178.6 64 320 64C461.4 64 576 178.6 576 320C576 461.4 461.4 576 320 576C178.6 576 64 461.4 64 320zM320 336C359.8 336 392 303.8 392 264C392 224.2 359.8 192 320 192C280.2 192 248 224.2 248 264C248 303.8 280.2 336 320 336z" />
-              </svg>{" "}
-              <div className="c-card-header-info">
-                <h3 for="Delivery">General-detail</h3>
-              </div>
+
+          <div className="cc-personal-detail">
+            {/*customer details */}
+            <div className="cc-name">
+                <p>Name</p>
+                <input
+                  placeholder="write your name"
+                  type="text"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                />
             </div>
-            <div className="personel-details-name">
-              <p>Name</p>
-              <input
-                placeholder="write your name"
-                type="text"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-              />
-            </div>
-            <div className="personel-details-phone">
+             <div className="cc-phone">
               <p>Phone</p>
               <input
                 placeholder="write you phoneNumber"
@@ -206,14 +200,11 @@ function Checkout({
               />
             </div>
           </div>
-
+        </div>
+        
+         
+          {/*order button */}
           <div className="order-btn">
-            <form
-              onSubmit={() => {
-                e.preventDefault();
-                onPlaceOrder;
-              }}
-            >
               <button
                 className={`button ${isFormValid ? "enabled" : "disabled"}`}
                 type="submit"
@@ -222,19 +213,16 @@ function Checkout({
                 onClick={() => {
                   showToast("ordersubmitted succesfully !", "success");
                   sendToGoogleSheets();
-                  onPlaceOrder();
+                  
                 }}
               >
                 complete order
               </button>
-            </form>
-
             <span>Take a screenshot of mpesa massege and forward</span>
+            </div>
           </div>
-        </div>
-      </div>
     </>
   );
 }
 
-export default Checkout;
+export default CheckoutCart;

@@ -11,7 +11,7 @@ const filteredProducts = selectedCategory === "all"
                   <>
                       <div
                         className="product-card pc-card"
-                        key={product.name}
+                        key={product.id}
                         onClick={() => onSelectProduct(product)}
                       >
                         <div className="image-container">
@@ -36,7 +36,7 @@ const filteredProducts = selectedCategory === "all"
                               onOrderNow()
                             }}
                           >
-                            Order Now
+                            Add to cart
                           </button>
                         </div>
                       </div>

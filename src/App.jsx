@@ -9,10 +9,12 @@ import Category from "./Category.jsx";
 import Toast from "./components/Toast.jsx";
 import ProductList from "./components/ProductList.jsx";
 import Checkout from "./components/Checkout.jsx";
+import CheckoutCart from "./components/CheckoutCart.jsx"
 import HomeProductRow from "./HomeProductRow.jsx";
 
 function App() {
   const [active, setActive] = useState("home");
+  const [cartItems, setCartItems] = useState([])
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showCheckout, setshowCheckOut] = useState(false);
@@ -48,23 +50,30 @@ function App() {
     setDeliveryArea("");
   };
   const handlePlaceOrder = () => {
-
+    const deliveryCost = deliveryPrices[deliveryArea] || 0
+    const subtotal = cartItems.reduce(
+      (sum, item) => sum + item.price * item.quantity, 0
+    ) ;
+    const total = subtotal + deliveryCost;
+    const itemsMessage = cartItems
+    .map((item) => `${item.name}: ${item.price} X ${item.quantity}= KES ${item.price * item.quantity}`)
+    .join("\n")
     const message = `
-    Hello,i'm making an order
-    product: ${selectedProduct.name}
-    price: KES ${selectedProduct.price}
-    delivery: ${deliveryArea}(KES${deliveryCost})
-    pickuppoint: ${pickuppoint}
-    Total: kES ${total}
-    customer: ${customerName}
-    phone: ${phone}
-    💳 *Payment Instructions*
-    Pay to: 0793302518(M-Pesa)
-    Account: lewis irungu
-    After payment, send confirmation SMS here.
+Hello,i'm making an order
+${itemsMessage}
+Subtotal: KES ${subtotal}
+delivery: ${deliveryArea}(KES${deliveryCost})
+pickuppoint: ${pickuppoint}
+Total: kES ${total}
+customer: ${customerName}
+phone: ${phone}
+💳 *Payment Instructions*
+Pay to: 0793302518(M-Pesa)
+Account: lewis irungu
+After payment, send confirmation SMS here.
 
-    Thank you for choosing us! ✨
-    `;
+Thank you for choosing us! ✨
+`;
     const whatsappNumber = "254793302518";
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
       message
@@ -100,6 +109,22 @@ function App() {
       redirectTimer = null;
     }
   };
+  function addToCart(product){
+    setCartItems((prevCart)=>{
+      const productId = product.id || product.name;
+      const existing = prevCart.find((item) => item.id === productId);
+      if(existing){
+        return prevCart.map((item)=>
+        item.id === productId
+         ? {...item,quantity: item.quantity +1 } 
+         : item
+        );
+    } else {
+      return [...prevCart, {...product,id: productId, quantity: 1}]
+    }
+    });
+    showToast(`${product.name} added to cart`, "success")
+  }
 
   return (
     <>
@@ -129,10 +154,11 @@ function App() {
                     category="perfume"
                     products={products}
                     onSelectProduct={(prod) => {
+                       addToCart(prod)
                       window.scrollTo(0, 0);
                       setSelectedProduct(prod);
-                      setshowCheckOut(true);
-                      setActive("category");
+                      
+                      setActive("cart");
                       showToast(`selected: ${prod.name}`, "info");
                     }}
                     onSeeMore={(cat) => {
@@ -146,10 +172,11 @@ function App() {
                     products={products}
                     onSelectProduct={(prod) => {
                       window.scrollTo(0, 0);
+                       addToCart(prod)
                       setSelectedProduct(prod);
                       showToast(`selected: ${prod.name}`, "info");
-                      setshowCheckOut(true);
-                      setActive("category");
+                      
+                      setActive("cart");
                     }}
                     onSeeMore={(cat) => {
                       setSelectedCategory(cat);
@@ -191,10 +218,10 @@ function App() {
               setLoading={setLoading}
               products={products}
               selectedCategory={selectedCategory}
-              onSelectProduct={setSelectedProduct}
+              onSelectProduct={(prod) => addToCart(prod)}
               onOrderNow={() => {
                 window.scrollTo(0, 0); //scrolls to top
-                setshowCheckOut(true);
+                setActive("cart")
                 showToast("proceeding to checkout...", "info");
               }}
               setSelectedCategory={setSelectedCategory}
@@ -216,7 +243,6 @@ function App() {
               setCustomerName={setCustomerName}
               phone={phone}
               setPhone={setPhone}
-              setActive={setActive}
               showToast={showToast}
               onBack={() => {
                 setshowCheckOut(false);
@@ -225,7 +251,35 @@ function App() {
               onPlaceOrder={handlePlaceOrder}
             />
           )}
-          {active === "cart" && <Cart />}
+          {active === "checkoutCart" && (
+            <CheckoutCart 
+              items={cartItems}
+              deliveryPrices={deliveryPrices}
+              deliveryArea={deliveryArea}
+              setDeliveryArea={setDeliveryArea}
+              setPickupPoint={setPickupPoint}
+              pickupPoint={pickuppoint}
+              pickupOptions={pickupointOption}
+              customerName={customerName}
+              setCustomerName={setCustomerName}
+              phone={phone}
+              setPhone={setPhone}
+              showToast={showToast}
+              setActive={setActive}
+              onPlaceOrder={handlePlaceOrder}
+              onBack={()=> setActive("cart")}    
+            />
+          )}
+          {active === "cart" && 
+          <Cart 
+           items={cartItems} 
+           setCartItems={setCartItems} 
+           onBack={()=> setActive("category")} 
+          onCheckout={()=>{
+            setActive("checkoutCart");
+            showToast("proceeding to checkout...", "info")
+             window.scrollTo(0, 0);
+          }}/>}
           {active === "help" && <Help />}
         </main>
       </div>
