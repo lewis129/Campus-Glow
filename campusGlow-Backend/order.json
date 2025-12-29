@@ -1,0 +1,29 @@
+[
+  {
+    "items": [
+      {
+        "name": "BOSS ORANGE",
+        "price": 200,
+        "quantity": 1,
+        "type": "smart collection"
+      },
+      {
+        "name": "GUCCI GUILTY",
+        "price": 200,
+        "quantity": 3,
+        "type": "smart collection"
+      },
+      {
+        "name": "INVICTUS",
+        "price": 200,
+        "quantity": 6,
+        "type": "smart collection"
+      }
+    ],
+    "deliveryArea": "juja",
+    "pickupPoint": "juja city mall",
+    "total": 2200,
+    "customerName": "ggggg",
+    "phone": "444444"
+  }
+]
