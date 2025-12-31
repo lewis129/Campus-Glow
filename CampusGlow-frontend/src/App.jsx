@@ -7,14 +7,15 @@ import Help from "./Help.jsx";
 import Cart from "./Cart.jsx";
 import Category from "./Category.jsx";
 import Toast from "./components/Toast.jsx";
+import ProductDetail from "./components/ProductDetail.jsx";
 import ProductList from "./components/ProductList.jsx";
 import Checkout from "./components/Checkout.jsx";
-import CheckoutCart from "./components/CheckoutCart.jsx"
+import CheckoutCart from "./components/CheckoutCart.jsx";
 import HomeProductRow from "./HomeProductRow.jsx";
 
 function App() {
   const [active, setActive] = useState("home");
-  const [cartItems, setCartItems] = useState([])
+  const [cartItems, setCartItems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showCheckout, setshowCheckOut] = useState(false);
@@ -50,14 +51,20 @@ function App() {
     setDeliveryArea("");
   };
   const handlePlaceOrder = () => {
-    const deliveryCost = deliveryPrices[deliveryArea] || 0
+    const deliveryCost = deliveryPrices[deliveryArea] || 0;
     const subtotal = cartItems.reduce(
-      (sum, item) => sum + item.price * item.quantity, 0
-    ) ;
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
     const total = subtotal + deliveryCost;
     const itemsMessage = cartItems
-    .map((item) => `${item.name}: ${item.price} X ${item.quantity}= KES ${item.price * item.quantity}`)
-    .join("\n")
+      .map(
+        (item) =>
+          `${item.name}: ${item.price} X ${item.quantity}= KES ${
+            item.price * item.quantity
+          }`
+      )
+      .join("\n");
     const message = `
 Hello,i'm making an order
 ${itemsMessage}
@@ -83,7 +90,7 @@ Thank you for choosing us! ✨
   useEffect(() => {
     setLoading(true);
     fetch(
-      "https://script.google.com/macros/s/AKfycbxy3o8SWwGZl0iFbsS4X204jucYsUg3lMZWFRLblMg89q502yLh045PA90pAxXmHJj-2w/exec"
+      "https://script.google.com/macros/s/AKfycbxvN52mJq-cZG3W7i_Vg36ZKQQbpBvw8XerhQXEbDgl9_g_7TfDWWVq-wtkp0MnJcHZ4A/exec"
     )
       .then((res) => res.json())
       .then((data) => {
@@ -109,21 +116,21 @@ Thank you for choosing us! ✨
       redirectTimer = null;
     }
   };
-  function addToCart(product){
-    setCartItems((prevCart)=>{
+  function addToCart(product) {
+    setCartItems((prevCart) => {
       const productId = product.id || product.name;
       const existing = prevCart.find((item) => item.id === productId);
-      if(existing){
-        return prevCart.map((item)=>
-        item.id === productId
-         ? {...item,quantity: item.quantity +1 } 
-         : item
+      if (existing) {
+        return prevCart.map((item) =>
+          item.id === productId
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
-    } else {
-      return [...prevCart, {...product,id: productId, quantity: 1}]
-    }
+      } else {
+        return [...prevCart, { ...product, id: productId, quantity: 1 }];
+      }
     });
-    showToast(`${product.name} added to cart`, "success")
+    showToast(`${product.name} added to cart`, "success");
   }
 
   return (
@@ -154,11 +161,9 @@ Thank you for choosing us! ✨
                     category="perfume"
                     products={products}
                     onSelectProduct={(prod) => {
-                       addToCart(prod)
                       window.scrollTo(0, 0);
                       setSelectedProduct(prod);
-                      
-                      setActive("cart");
+                      setActive("details");
                       showToast(`selected: ${prod.name}`, "info");
                     }}
                     onSeeMore={(cat) => {
@@ -172,11 +177,9 @@ Thank you for choosing us! ✨
                     products={products}
                     onSelectProduct={(prod) => {
                       window.scrollTo(0, 0);
-                       addToCart(prod)
                       setSelectedProduct(prod);
                       showToast(`selected: ${prod.name}`, "info");
-                      
-                      setActive("cart");
+                      setActive("details");
                     }}
                     onSeeMore={(cat) => {
                       setSelectedCategory(cat);
@@ -218,15 +221,27 @@ Thank you for choosing us! ✨
               setLoading={setLoading}
               products={products}
               selectedCategory={selectedCategory}
-              onSelectProduct={(prod) => addToCart(prod)}
-              onOrderNow={() => {
+              onSelectProduct={(prod) => {
+                setSelectedProduct(prod);
                 window.scrollTo(0, 0); //scrolls to top
-                setActive("cart")
                 showToast("proceeding to checkout...", "info");
+                setActive("details");
               }}
               setSelectedCategory={setSelectedCategory}
             />
           )}
+          {active === "details" && selectedProduct && (
+            <ProductDetail
+              onSelectProduct={(prod) => addToCart(prod)}
+              product={selectedProduct}
+              onAddToCart={() => {
+                addToCart(prod);
+                setActive("cart");
+              }}
+              onBack={() => setActive("category")}
+            />
+          )}
+
           {active === "category" && showCheckout && selectedProduct && (
             <Checkout
               product={selectedProduct}
@@ -252,7 +267,7 @@ Thank you for choosing us! ✨
             />
           )}
           {active === "checkoutCart" && (
-            <CheckoutCart 
+            <CheckoutCart
               items={cartItems}
               deliveryPrices={deliveryPrices}
               deliveryArea={deliveryArea}
@@ -267,19 +282,21 @@ Thank you for choosing us! ✨
               showToast={showToast}
               setActive={setActive}
               onPlaceOrder={handlePlaceOrder}
-              onBack={()=> setActive("cart")}    
+              onBack={() => setActive("cart")}
             />
           )}
-          {active === "cart" && 
-          <Cart 
-           items={cartItems} 
-           setCartItems={setCartItems} 
-           onBack={()=> setActive("category")} 
-          onCheckout={()=>{
-            setActive("checkoutCart");
-            showToast("proceeding to checkout...", "info")
-             window.scrollTo(0, 0);
-          }}/>}
+          {active === "cart" && (
+            <Cart
+              items={cartItems}
+              setCartItems={setCartItems}
+              onBack={() => setActive("category")}
+              onCheckout={() => {
+                setActive("checkoutCart");
+                showToast("proceeding to checkout...", "info");
+                window.scrollTo(0, 0);
+              }}
+            />
+          )}
           {active === "help" && <Help />}
         </main>
       </div>

@@ -7,7 +7,6 @@ const { google } = require("googleapis");
 const app = express();
 app.use(cors());
 app.use(express.json());
-
 // --- Google Sheets Setup ---
 const credentials = require("./campusglow-backend-a3616ffd5b46.json"); // your downloaded service account key
 const auth = new google.auth.GoogleAuth({
@@ -62,7 +61,11 @@ app.post("/order", async (req, res) => {
       requestBody: { values },
     });
 
-    res.json({ ok: true, message: "Order saved to file and Google Sheets", order: orderData });
+    res.json({
+      ok: true,
+      message: "Order saved to file and Google Sheets",
+      order: orderData,
+    });
   } catch (err) {
     console.error("Error saving to Google Sheets:", err);
     res.status(500).json({ ok: false, message: "Failed to save order" });
