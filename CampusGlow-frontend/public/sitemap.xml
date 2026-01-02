@@ -5,11 +5,11 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://campusglow.vercel.app/src/cart</loc>
+    <loc>https://campusglow.vercel.app/cart</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://campusglow.vercel.app/src/components/checkoutCart</loc>
+    <loc>https://campusglow.vercel.app/checkoutCart</loc>
     <priority>0.8</priority>
   </url>
 </urlset>
