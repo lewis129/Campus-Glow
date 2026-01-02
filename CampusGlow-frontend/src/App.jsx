@@ -9,7 +9,6 @@ import Category from "./Category.jsx";
 import Toast from "./components/Toast.jsx";
 import ProductDetail from "./components/ProductDetail.jsx";
 import ProductList from "./components/ProductList.jsx";
-import Checkout from "./components/Checkout.jsx";
 import CheckoutCart from "./components/CheckoutCart.jsx";
 import HomeProductRow from "./HomeProductRow.jsx";
 
