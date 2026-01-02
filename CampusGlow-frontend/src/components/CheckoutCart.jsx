@@ -31,8 +31,10 @@ function CheckoutCart({
             type: item.type,
         })),
       deliveryArea,
+      deliveryCost,
       pickupPoint,
       total,
+      subtotal,
       customerName,
       phone,
     };
@@ -247,6 +249,7 @@ function CheckoutCart({
                 onClick={() => {
                   showToast("ordersubmitted succesfully !", "success");
                   submitToBackend();
+                  onPlaceOrder();
                 }}
               >
                 complete order

@@ -33,10 +33,10 @@ const filteredProducts = selectedCategory === "all"
                             onClick={(e) => {
                               e.stopPropagation(); // prevent card click conflict
                               onSelectProduct(product);
-                              onOrderNow()
+                              
                             }}
                           >
-                            Add to cart
+                            View
                           </button>
                         </div>
                       </div>

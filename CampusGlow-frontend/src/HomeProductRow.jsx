@@ -40,7 +40,7 @@ const HomeProductRow = ({
                 onSelectProduct(prod);
               }}
             >
-              Order Now
+              view
             </button>
           </div>
         ))}
