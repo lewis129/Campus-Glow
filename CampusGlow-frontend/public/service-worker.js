@@ -2,9 +2,9 @@ const CACHE_NAME = "campus-glow-cache-v1";
 const urlsToCache = [
   "/",              // root
   "/index.html",    // main HTML
-  "/styles.css",    // your CSS
-  "/app.js",        // your JS
-  "/logo.png",      // example image
+  "/index.css",    // your CSS
+  "/app.jsx",        // your JS
+  "/logo.jpg",      // example image
   "/offline.html"   // fallback page
 ];
 
