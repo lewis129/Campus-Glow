@@ -27,14 +27,14 @@ function App() {
   const [pickuppoint, setPickupPoint] = useState("");
   const [deliveryArea, setDeliveryArea] = useState("");
   const deliveryPrices = {
-    thika: 300,
-    juja: 200,
-    riuru: 250,
+    Thika: 100,
+    Juja: 80,
+    Campuses: 120,
   };
   const pickupointOption = {
-    thika: ["thika stage", "weteithie", "kiganja"],
-    juja: ["juja stage", "juja city mall", "juja gate"],
-    riuru: ["ruiru membley", "ruiru stage"],
+    Thika: ["thika stage", "weteithie", "mku","weteithie","ngoingwa"],
+    Juja: ["juja stage", "juja city mall", "juja gate", "highpoint"],
+    Campuses: ["Greitsa uni", "MKU(thika)" , "JKUAT uni", "Zetech uni","Thika Training Technical Institute(TTTI)", "KMTC(thika)"],
   };
 
   let deliveryCost = 0;
