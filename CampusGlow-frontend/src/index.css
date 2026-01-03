@@ -190,7 +190,7 @@ body {
   flex-direction: row;
   justify-content: space-between;
   gap: 5px;
-  margin: 0px 4 0px;
+  margin: 0px 40px;
   padding: 0px;
   align-items: center;
 }
@@ -241,8 +241,8 @@ body {
   }
   .why-us-card {
     max-width: 100%;
-    width: 100px;
-    height: 250px;
+    width: 140px;
+    height: 200px;
   }
   .why-us-h2 {
     font-size: 16px;
@@ -286,7 +286,7 @@ body {
   align-items: center;
 
   background: rgb(226, 224, 224);
-  border-top: 1px solid #ddd;
+  
   z-index: 1000;
   cursor: pointer;
 }
@@ -299,10 +299,19 @@ body {
 }
 
 .bottom-nav .active {
-  color: #812323;
+  color: white;
   font-weight: bold;
   border: #000;
-  border-top: 10px rgb(138, 28, 28);
+  border-radius: 50px;
+  padding: 10px 10px 10px 10px;
+  background-image: linear-gradient(
+    145deg,
+    #4da6ee7c,
+    #cf3959,
+    #c01d59,
+    #6b1096,
+    #901749
+  );
 }
 
 /* help */
