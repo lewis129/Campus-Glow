@@ -1,23 +1,50 @@
 import { useState, useEffect } from "react";
-import Header from "./Header.jsx";
-import Banner from "./Banner.jsx";
-import Whyus from "./Whyus.jsx";
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home.jsx";
 import BottomNav from "./BottomNav.jsx";
 import Help from "./Help.jsx";
 import Cart from "./Cart.jsx";
 import Category from "./Category.jsx";
+import Login from "./pages/Login.jsx";
+import SignUp from "./pages/SignUp.jsx";
+import Profile from "./pages/Profile.jsx";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Toast from "./components/Toast.jsx";
 import ProductDetail from "./components/ProductDetail.jsx";
 import ProductList from "./components/ProductList.jsx";
 import CheckoutCart from "./components/CheckoutCart.jsx";
-import HomeProductRow from "./HomeProductRow.jsx";
+import { useNavigate } from "react-router-dom";
+import Admin from "./pages/Admin/Admin.jsx";
+import AdminRoute from "./components/AdminRoute.jsx";
+import AdminProducts from "./pages/Admin/AdminProducts.jsx";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "./firebase.js";
+import { useLocation } from "react-router-dom";
+import Settings from "./pages/Settingscard/Settings.jsx";
+import ThemeToggle from "./components/ThemeToggle.jsx";
+import DarkMode from "./pages/Settingscard/DarkMode.jsx";
 
 function App() {
-  const [active, setActive] = useState("home");
+  const location = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+  const hideDarkMode =
+    location.pathname.startsWith("/product") ||
+    location.pathname === "/checkout" ||
+    location.pathname === "/category" ||
+    location.pathname === "/profile" ||
+    location.pathname === "/settings" ||
+    location.pathname === "/admin" ||
+    location.pathname === "/cart";
+  const hideBottomNav =
+    location.pathname.startsWith("/product") ||
+    location.pathname === "/checkout" ||
+    location.pathname === "/category/:category" ||
+    location.pathname === "/settings" 
   const [cartItems, setCartItems] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [showCheckout, setshowCheckOut] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("all ");
+  const [orders, setOrders] = useState([]);
   const [customerName, setCustomerName] = useState("");
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
   let redirectTimer = null;
@@ -32,28 +59,29 @@ function App() {
     Campuses: 120,
   };
   const pickupointOption = {
-    Thika: ["thika stage", "weteithie", "mku","weteithie","ngoingwa"],
+    Thika: ["thika stage", "weteithie", "mku", "weteithie", "ngoingwa"],
     Juja: ["juja stage", "juja city mall", "juja gate", "highpoint"],
-    Campuses: ["Greitsa uni", "MKU(thika)" , "JKUAT uni", "Zetech uni","Thika Training Technical Institute(TTTI)", "KMTC(thika)"],
+    Campuses: [
+      "Greitsa uni",
+      "MKU(thika)",
+      "JKUAT uni",
+      "Zetech uni",
+      "Thika Training Technical Institute(TTTI)",
+      "KMTC(thika)",
+    ],
   };
 
-  let deliveryCost = 0;
-  let total = 0;
-
-  if (showCheckout && selectedProduct) {
-    deliveryCost = deliveryPrices[deliveryArea];
-    total = selectedProduct.price + deliveryCost;
-  }
   const resetCheckout = () => {
     setCustomerName("");
     setPhone("");
     setDeliveryArea("");
+    
   };
   const handlePlaceOrder = () => {
     const deliveryCost = deliveryPrices[deliveryArea] || 0;
     const subtotal = cartItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
-      0
+      0,
     );
     const total = subtotal + deliveryCost;
     const itemsMessage = cartItems
@@ -61,7 +89,7 @@ function App() {
         (item) =>
           `${item.name}: ${item.price} X ${item.quantity}= KES ${
             item.price * item.quantity
-          }`
+          }`,
       )
       .join("\n");
     const message = `
@@ -82,26 +110,29 @@ Thank you for choosing us! ✨
 `;
     const whatsappNumber = "254793302518";
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-      message
+      message,
     )}`;
     window.open(url, "_blank");
   };
   useEffect(() => {
-    setLoading(true);
-    fetch(
-      "https://script.google.com/macros/s/AKfycbxvN52mJq-cZG3W7i_Vg36ZKQQbpBvw8XerhQXEbDgl9_g_7TfDWWVq-wtkp0MnJcHZ4A/exec"
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setProducts(data);
+    async function fetchProducts() {
+      try {
+        const snapshot = await getDocs(collection(db, "products"));
+
+        const items = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setProducts(items);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      } finally {
         setLoading(false);
-        showToast(`welcome!`, "info");
-      })
-      .catch((err) => {
-        console.log("fetch error:", err);
-        setLoading(false);
-        showToast("an error occured!", "err");
-      });
+      }
+    }
+
+    fetchProducts();
   }, []);
 
   const showToast = (message, type = "success") => {
@@ -123,7 +154,7 @@ Thank you for choosing us! ✨
         return prevCart.map((item) =>
           item.id === productId
             ? { ...item, quantity: item.quantity + 1 }
-            : item
+            : item,
         );
       } else {
         return [...prevCart, { ...product, id: productId, quantity: 1 }];
@@ -131,6 +162,14 @@ Thank you for choosing us! ✨
     });
     showToast(`${product.name} added to cart`, "success");
   }
+
+  const navigate = useNavigate();
+
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   return (
     <>
@@ -146,160 +185,149 @@ Thank you for choosing us! ✨
               }}
             />
           )}
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
 
-          {active === "home" && (
-            <>
-              <Header />
-              <Banner />
-              <Whyus />
-              {loading && <p>Loading products...</p>}
-              {active === "home" && !loading && (
-                <div>
-                  <HomeProductRow
-                    title="Best selling Perfumes"
-                    category="perfume"
-                    products={products}
-                    onSelectProduct={(prod) => {
-                      window.scrollTo(0, 0);
-                      setSelectedProduct(prod);
-                      setActive("details");
-                      showToast(`selected: ${prod.name}`, "info");
-                    }}
-                    onSeeMore={(cat) => {
-                      setActive("category");
-                      setSelectedCategory(cat);
-                    }}
-                  />
-                  <HomeProductRow
-                    title="Best selling Body lotion"
-                    category="bodylotion"
-                    products={products}
-                    onSelectProduct={(prod) => {
-                      window.scrollTo(0, 0);
-                      setSelectedProduct(prod);
-                      showToast(`selected: ${prod.name}`, "info");
-                      setActive("details");
-                    }}
-                    onSeeMore={(cat) => {
-                      setSelectedCategory(cat);
-                      setActive("category");
-                    }}
-                  />
-                  {/* <HomeProductRow 
-                    title="Best selling skincare"
-                    category="skincare"
-                    products={products}
-                     onSelectProduct={(prod)=> {
-                       window.scrollTo(0,0);
-                    setSelectedProduct(prod);
-                    showToast(`selected: ${prod.name}`, "info")
-                    setshowCheckOut(true);
-                    setActive('category');
-                  }}
-                    onSeeMore={(cat)=>{
-                      setActive('category')
-                      setSelectedCategory(cat)
-                    }}
-                  /> */}
-                </div>
-              )}
-            </>
-          )}
+            {/* Protected app */}
+            <Route
+              path="/"
+              element={
+                <Home
+                  loading={loading}
+                  products={products}
+                  setSelectedCategory={setSelectedCategory}
+                  showToast={showToast}
+                />
+              }
+            />
 
-          {active === "category" && !selectedCategory && !showCheckout && (
-            <Category
-              onSelect={setSelectedCategory}
-              products={products || []}
-              selectedCategory={selectedCategory}
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
             />
-          )}
-          {/* products */}
-          {active === "category" && selectedCategory && !showCheckout && (
-            <ProductList
-              loading={loading}
-              setLoading={setLoading}
-              products={products}
-              selectedCategory={selectedCategory}
-              onSelectProduct={(prod) => {
-                setSelectedProduct(prod);
-                window.scrollTo(0, 0); //scrolls to top
-                showToast("proceeding to checkout...", "info");
-                setActive("details");
-              }}
-              setSelectedCategory={setSelectedCategory}
-            />
-          )}
-          {active === "details" && selectedProduct && (
-            <ProductDetail
-              onSelectProduct={(prod) => addToCart(prod)}
-              product={selectedProduct}
-              onAddToCart={() => {
-                addToCart(prod);
-                setActive("cart");
-              }}
-              onBack={() => setActive("category")}
-            />
-          )}
 
-          {active === "category" && showCheckout && selectedProduct && (
-            <Checkout
-              product={selectedProduct}
-              category={selectedCategory}
-              deliveryPrices={deliveryPrices}
-              deliveryArea={deliveryArea}
-              setDeliveryArea={setDeliveryArea}
-              setPickupPoint={setPickupPoint}
-              pickupPoint={pickuppoint}
-              pickupOptions={pickupointOption}
-              deliveryCost={deliveryCost}
-              total={total}
-              customerName={customerName}
-              setCustomerName={setCustomerName}
-              phone={phone}
-              setPhone={setPhone}
-              showToast={showToast}
-              onBack={() => {
-                setshowCheckOut(false);
-                resetCheckout();
-              }}
-              onPlaceOrder={handlePlaceOrder}
+            {/* CATEGORY */}
+            <Route
+              path="/category"
+              element={
+                <Category
+                  products={products || []}
+                  onSelect={setSelectedCategory}
+                />
+              }
             />
-          )}
-          {active === "checkoutCart" && (
-            <CheckoutCart
-              items={cartItems}
-              deliveryPrices={deliveryPrices}
-              deliveryArea={deliveryArea}
-              setDeliveryArea={setDeliveryArea}
-              setPickupPoint={setPickupPoint}
-              pickupPoint={pickuppoint}
-              pickupOptions={pickupointOption}
-              customerName={customerName}
-              setCustomerName={setCustomerName}
-              phone={phone}
-              setPhone={setPhone}
-              showToast={showToast}
-              setActive={setActive}
-              onPlaceOrder={handlePlaceOrder}
-              onBack={() => setActive("cart")}
+
+            {/* PRODUCTS IN CATEGORY */}
+            <Route
+              path="/category/:category"
+              element={
+                <ProductList
+                  selectedCategory={selectedCategory}
+                  products={products}
+                />
+              }
             />
-          )}
-          {active === "cart" && (
-            <Cart
-              items={cartItems}
-              setCartItems={setCartItems}
-              onBack={() => setActive("category")}
-              onCheckout={() => {
-                setActive("checkoutCart");
-                showToast("proceeding to checkout...", "info");
-                window.scrollTo(0, 0);
-              }}
+
+            {/* PRODUCT DETAILS */}
+            <Route
+              path="/product/:id"
+              element={
+                <ProductDetail
+                  products={products}
+                  addToCart={addToCart}
+                  showToast={showToast}
+                  onAddToCart={(prod) => addToCart(prod)}
+                  onBuyNow={() => navigate("/checkout")}
+                  cart={cartItems}
+                />
+              }
             />
-          )}
-          {active === "help" && <Help />}
+
+            {/* CART */}
+            <Route
+              path="/cart"
+              element={
+                <Cart
+                  orders={orders}
+                  setOrders={setOrders}
+                  items={cartItems}
+                  setCartItems={setCartItems}
+                  onCheckout={() => navigate("/checkout")}
+                />
+              }
+            />
+
+            {/* CHECKOUT */}
+            <Route
+              path="/checkout"
+              element={
+                <CheckoutCart
+                  items={cartItems}
+                  deliveryPrices={deliveryPrices}
+                  deliveryArea={deliveryArea}
+                  setDeliveryArea={setDeliveryArea}
+                  setPickupPoint={setPickupPoint}
+                  pickupPoint={pickuppoint}
+                  pickupOptions={pickupointOption}
+                  customerName={customerName}
+                  setCustomerName={setCustomerName}
+                  showToast={showToast}
+                  phone={phone}
+                  setPhone={setPhone}
+                  onPlaceOrder={handlePlaceOrder}
+                  resetCheckout={resetCheckout}
+                />
+              }
+            />
+
+            {/* HELP */}
+            <Route path="/help" element={<Help />} />
+            <Route
+              path="/darkmode"
+              element={<DarkMode theme={theme} setTheme={setTheme} />}
+            />
+
+            {/* PROFILE (PROTECTED) */}
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            {/* ADMIN DASHBOARD */}
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <Admin />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/products"
+              element={
+                <AdminRoute>
+                  <AdminProducts />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={<Settings theme={theme} setTheme={setTheme} />}
+            />
+          </Routes>
         </main>
+        {!hideBottomNav && <BottomNav />}
+        {!hideDarkMode && <ThemeToggle theme={theme} setTheme={setTheme} />}
       </div>
-      <BottomNav active={active} setActive={setActive} />
     </>
   );
 }
